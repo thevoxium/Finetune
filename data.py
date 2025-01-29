@@ -35,6 +35,46 @@ class CollectData:
 
         return unique_submissions
 
+    def collect_tourist_data(self, num_problems = None):
+        print("Creating Tourist Submissions Data!")
+
+        submissions = self.get_tourist_submissions(count = num_problems)
+        dataset = []
+
+        for idx, submission in enumerate(submissions):
+            contest_id = submission['problem']['contestId']
+            problem_index = submission['problem']['index']
+            submission_id = submission['id']
+
+            print(f"Processing problem {idx+1}/{len(submissions)}: Contest {contest_id}, Problem {problem_index}")
+
+            problem_data = self.get_problem_data(contest_id, problem_index)
+            if not problem_data:
+                print(f"Skipping problem {contest_id}{problem_index} - couldn't fetch problem data")
+                continue
+
+            solution = self.get_submission_code(contest_id, submission_id)
+            if not solution:
+                print(f"Skipping problem {contest_id}{problem_index} - couldn't fetch solution")
+                continue
+
+            problem_data.update({
+                'contest_id': contest_id,
+                'problem_index': problem_index,
+                'submission_id': submission_id,
+                'solution': solution,
+                'tags': submission['problem'].get('tags', []),
+                'rating': submission['problem'].get('rating'),
+                'submission_time': submission['creationTimeSeconds']
+            })
+
+            dataset.append(problem_data)
+            time.sleep(1)
+
+        return dataset
+
+
+
 
 
 
